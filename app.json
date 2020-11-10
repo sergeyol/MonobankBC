@@ -1,0 +1,25 @@
+{
+  "id": "55a84767-ab55-4d24-8bc7-a344ebb0d83a",
+  "name": "Monobank Sync",
+  "publisher": "Sergii Olefirenko",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "https://github.com/sergeyol/MonobankBC",
+  "logo": "",
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "17.0.0.0",
+  "application": "17.0.0.0",
+  "idRanges": [
+    {
+      "from": 50180,
+      "to": 50184
+    }
+  ],
+  "showMyCode": true,
+  "runtime": "6.0"
+}
