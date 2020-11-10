@@ -1,7 +1,5 @@
 # Monobank Sync
 
-Extension for Microsoft Dynamics 365 Business Central that implements
-
 Расширение для Microsoft Dynamics 365 Business Central, которое реализует работу с Monobank API:
 
 https://api.monobank.ua/docs/
