@@ -84,8 +84,8 @@ codeunit 50180 "Monobank API"
             MonobankAccount."Account Id" := AccountId;
         end;
 
-        MonobankAccount.validate("Currency Id", GetTokenValue(AccountJObject, 'currencyCode').AsInteger());
-
+        MonobankAccount."Currency Id" := GetTokenValue(AccountJObject, 'currencyCode').AsInteger();
+        MonobankAccount."Currency Code" := FindCurrencyCodeByIso(MonobankAccount."Currency Id");
         MonobankAccount.Type := GetTokenValue(AccountJObject, 'type').AsText();
         MonobankAccount.IBAN := GetTokenValue(AccountJObject, 'iban').AsText();
         MonobankAccount."Cashback Type" := GetTokenValue(AccountJObject, 'cashbackType').AsText();
@@ -186,7 +186,8 @@ codeunit 50180 "Monobank API"
         MonobankStatement.MCC := GetTokenValue(StatementJObject, 'mcc').AsInteger();
         MonobankStatement.Amount := 0.01 * GetTokenValue(StatementJObject, 'amount').AsInteger();
         MonobankStatement."Operation Amount" := 0.01 * GetTokenValue(StatementJObject, 'operationAmount').AsInteger();
-        MonobankStatement.Validate("Currency Id", GetTokenValue(StatementJObject, 'currencyCode').AsInteger());
+        MonobankStatement."Currency Id" := GetTokenValue(StatementJObject, 'currencyCode').AsInteger();
+        MonobankStatement."Currency Code" := FindCurrencyCodeByIso(MonobankStatement."Currency Id");
         MonobankStatement."Commission Rate" := 0.01 * GetTokenValue(StatementJObject, 'commissionRate').AsDecimal();
         MonobankStatement."Cashback Amount" := 0.01 * GetTokenValue(StatementJObject, 'cashbackAmount').AsInteger();
         MonobankStatement.Balance := 0.01 * GetTokenValue(StatementJObject, 'balance').AsInteger();
@@ -229,4 +230,25 @@ codeunit 50180 "Monobank API"
         UnixTime := FromDateTime - EpochDateTime;
         UnixTime := UnixTime / 1000;
     end;
+
+    local procedure FindCurrencyCodeByIso(IsoNumericCode: Integer) CurrencyCode: Code[10]
+    var
+        Currency: Record Currency;
+    begin
+        Currency.SetRange("ISO Numeric Code", Format(IsoNumericCode));
+        if Currency.FindFirst() then
+            exit(Currency.Code);
+
+        case IsoNumericCode of
+            978:
+                exit('EUR');
+            985:
+                exit('PLN');
+            980:
+                exit('UAH');
+            840:
+                exit('USD');
+        end;
+    end;
+
 }

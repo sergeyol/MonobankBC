@@ -19,14 +19,6 @@ table 50181 "Monobank Account"
         {
             Caption = 'Currency Id';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            var
-                Currency: Record Currency;
-            begin
-                Currency.SetRange("ISO Numeric Code", Format("Currency Id"));
-                if Currency.FindFirst() then
-                    "Currency Code" := Currency.Code;
-            end;
         }
         field(51; "Currency Code"; Code[10])
         {
