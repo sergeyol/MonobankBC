@@ -25,9 +25,19 @@ table 50182 "Monobank Statement"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+        field(31; Comment; Text[1024])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(40; MCC; Integer)
         {
             Caption = 'MCC';
+            DataClassification = CustomerContent;
+        }
+        field(41; "Original MCC"; Integer)
+        {
+            Caption = 'Original MCC';
             DataClassification = CustomerContent;
         }
         field(50; "Currency Id"; Integer)
@@ -62,14 +72,14 @@ table 50182 "Monobank Statement"
             DataClassification = CustomerContent;
             BlankZero = true;
         }
-        field(80; Balance; Decimal)
-        {
-            Caption = 'Balance';
-            DataClassification = CustomerContent;
-        }
         field(70; Hold; Boolean)
         {
             Caption = 'Hold';
+            DataClassification = CustomerContent;
+        }
+        field(80; Balance; Decimal)
+        {
+            Caption = 'Balance';
             DataClassification = CustomerContent;
         }
         field(90; "Unix Time"; BigInteger)
@@ -80,6 +90,16 @@ table 50182 "Monobank Statement"
         field(91; "Date Time"; DateTime)
         {
             Caption = 'Date Time';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Counter ERDPOU"; Text[10])
+        {
+            Caption = 'Counter EDRPOU';
+            DataClassification = CustomerContent;
+        }
+        field(110; "Counter IBAN"; Text[40])
+        {
+            Caption = 'Counter IBAN';
             DataClassification = CustomerContent;
         }
     }

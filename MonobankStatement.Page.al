@@ -44,6 +44,10 @@ page 50182 "Monobank Statement"
                 {
                     ApplicationArea = All;
                 }
+                field(Comment; Rec.Comment)
+                {
+                    ApplicationArea = All;
+                }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
@@ -78,6 +82,18 @@ page 50182 "Monobank Statement"
                     ApplicationArea = All;
                 }
                 field(MCC; Rec.MCC)
+                {
+                    ApplicationArea = All;
+                }
+                field("Original MCC"; Rec."Original MCC")
+                {
+                    ApplicationArea = All;
+                }
+                field("Counter ERDPOU"; Rec."Counter ERDPOU")
+                {
+                    ApplicationArea = All;
+                }
+                field("Counter IBAN"; Rec."Counter IBAN")
                 {
                     ApplicationArea = All;
                 }

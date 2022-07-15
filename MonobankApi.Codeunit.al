@@ -86,9 +86,9 @@ codeunit 50180 "Monobank API"
 
         MonobankAccount."Currency Id" := GetTokenValue(AccountJObject, 'currencyCode').AsInteger();
         MonobankAccount."Currency Code" := FindCurrencyCodeByIso(MonobankAccount."Currency Id");
-        MonobankAccount.Type := GetTokenValue(AccountJObject, 'type').AsText();
-        MonobankAccount.IBAN := GetTokenValue(AccountJObject, 'iban').AsText();
-        MonobankAccount."Cashback Type" := GetTokenValue(AccountJObject, 'cashbackType').AsText();
+        MonobankAccount.Type := GetTextValue(AccountJObject, 'type');
+        MonobankAccount.IBAN := GetTextValue(AccountJObject, 'iban');
+        MonobankAccount."Cashback Type" := GetTextValue(AccountJObject, 'cashbackType');
         MonobankAccount."Balance" := 0.01 * GetTokenValue(AccountJObject, 'balance').AsInteger();
         MonobankAccount."Credit Limit" := 0.01 * GetTokenValue(AccountJObject, 'creditLimit').AsInteger();
 
@@ -120,6 +120,37 @@ codeunit 50180 "Monobank API"
 
     procedure GetStatementForAccount(MonobankAccount: Record "Monobank Account")
     var
+        MonobankStatement: Record "Monobank Statement";
+        FromUnixTime, ToUnixTime : BigInteger;
+    begin
+        ToUnixTime := GetUnixTime(CurrentDateTime);
+        FromUnixTime := ToUnixTime - 2682000;   // approx. 1 month: max duration of statement request according to https://api.monobank.ua/docs/
+        MonobankStatement.SetRange("Account Id", MonobankAccount."Account Id");
+        MonobankStatement.SetCurrentKey("Date Time");
+        if MonobankStatement.findlast and (MonobankStatement."Unix Time" > FromUnixTime) then
+            FromUnixTime := MonobankStatement."Unix Time";
+
+        GetStatementForAccount(MonobankAccount, FromUnixTime, ToUnixTime);
+
+    end;
+
+    procedure GetStatementHistoryForAccount(MonobankAccount: Record "Monobank Account")
+    var
+        MonobankStatement: Record "Monobank Statement";
+        FromUnixTime, ToUnixTime : BigInteger;
+    begin
+        MonobankStatement.SetRange("Account Id", MonobankAccount."Account Id");
+        MonobankStatement.SetCurrentKey("Date Time");
+        if MonobankStatement.FindFirst() then begin
+            ToUnixTime := MonobankStatement."Unix Time";
+            FromUnixTime := ToUnixTime - 2682000;   // approx. 1 month: max duration of statement request according to https://api.monobank.ua/docs/
+
+            GetStatementForAccount(MonobankAccount, FromUnixTime, ToUnixTime);
+        end;
+    end;
+
+    procedure GetStatementForAccount(MonobankAccount: Record "Monobank Account"; FromUnixTime: BigInteger; ToUnixTime: BigInteger)
+    var
         RestClient: HttpClient;
         Response: HttpResponseMessage;
         Headers: HttpHeaders;
@@ -127,7 +158,6 @@ codeunit 50180 "Monobank API"
         TypeHelper: Codeunit "Type Helper";
         Result: Text;
         Address: Text;
-        FromTime, ToTime : BigInteger;
         JObject: JsonObject;
         JToken: JsonToken;
         JArray: JsonArray;
@@ -135,10 +165,7 @@ codeunit 50180 "Monobank API"
         ClientId: Text;
         ClientName: Text;
     begin
-        FromTime := GetLastStatementUnixTime(MonobankAccount."Account Id");
-        ToTime := FromTime + 2682000;   // approx. 1 month: max duration of statement request according to https://api.monobank.ua/docs/
-
-        Address := BaseURL + StrSubstNo('/personal/statement/%1/%2/%3', MonobankAccount."Account Id", FromTime, ToTime);
+        Address := BaseURL + StrSubstNo('/personal/statement/%1/%2/%3', MonobankAccount."Account Id", FromUnixTime, ToUnixTime);
 
         RestClient.DefaultRequestHeaders.Add('X-Token', GetAccessToken());
 
@@ -182,8 +209,10 @@ codeunit 50180 "Monobank API"
         MonobankStatement."Client Id" := MonobankAccount."Client Id";
         MonobankStatement."Unix Time" := GetTokenValue(StatementJObject, 'time').AsBigInteger();
         MonobankStatement."Date Time" := TypeHelper.EvaluateUnixTimestamp(MonobankStatement."Unix Time");
-        MonobankStatement.Description := GetTokenValue(StatementJObject, 'description').AsText();
+        MonobankStatement.Description := GetTextValue(StatementJObject, 'description');
+        MonobankStatement.Comment := GetTextValue(StatementJObject, 'comment');
         MonobankStatement.MCC := GetTokenValue(StatementJObject, 'mcc').AsInteger();
+        MonobankStatement."Original MCC" := GetTokenValue(StatementJObject, 'originalMcc').AsInteger();
         MonobankStatement.Amount := 0.01 * GetTokenValue(StatementJObject, 'amount').AsInteger();
         MonobankStatement."Operation Amount" := 0.01 * GetTokenValue(StatementJObject, 'operationAmount').AsInteger();
         MonobankStatement."Currency Id" := GetTokenValue(StatementJObject, 'currencyCode').AsInteger();
@@ -192,6 +221,8 @@ codeunit 50180 "Monobank API"
         MonobankStatement."Cashback Amount" := 0.01 * GetTokenValue(StatementJObject, 'cashbackAmount').AsInteger();
         MonobankStatement.Balance := 0.01 * GetTokenValue(StatementJObject, 'balance').AsInteger();
         MonobankStatement.Hold := GetTokenValue(StatementJObject, 'hold').AsBoolean();
+        MonobankStatement."Counter ERDPOU" := GetTextValue(StatementJObject, 'counterEdrpou');
+        MonobankStatement."Counter IBAN" := GetTextValue(StatementJObject, 'counterIban');
 
         if RecordExists then
             MonobankStatement.Modify(true)
@@ -221,14 +252,25 @@ codeunit 50180 "Monobank API"
             exit(JToken.AsValue());
     end;
 
+    local procedure GetTextValue(JObject: JsonObject; PropertyName: Text): Text
+    var
+        JToken: JsonToken;
+        JValue: JsonValue;
+    begin
+        if JObject.get(PropertyName, JToken) then
+            if JToken.IsValue() then
+                exit(JToken.AsValue().AsText());
+    end;
+
     local procedure GetUnixTime(FromDateTime: DateTime) UnixTime: BigInteger
     var
         EpochDateTime: DateTime;
+        EpochDuration: Duration;
     begin
         EpochDateTime := CreateDateTime(DMY2Date(1, 1, 1970), 0T);
 
-        UnixTime := FromDateTime - EpochDateTime;
-        UnixTime := UnixTime / 1000;
+        EpochDuration := FromDateTime - EpochDateTime;
+        UnixTime := Round(EpochDuration / 1000, 1);
     end;
 
     local procedure FindCurrencyCodeByIso(IsoNumericCode: Integer) CurrencyCode: Code[10]

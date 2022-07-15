@@ -113,6 +113,23 @@ page 50181 "Monobank Accounts"
                     MonobankApi.GetStatementForAccount(Rec);
                 end;
             }
+            action(SyncStatementHistory)
+            {
+                Caption = 'Sync Statement History';
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = RefreshLines;
+
+                trigger OnAction()
+                var
+                    MonobankApi: Codeunit "Monobank API";
+                begin
+                    MonobankApi.GetStatementHistoryForAccount(Rec);
+                end;
+            }
 
             action(ApiSetup)
             {
