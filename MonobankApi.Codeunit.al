@@ -86,6 +86,7 @@ codeunit 50180 "Monobank API"
 
         MonobankAccount."Currency Id" := GetTokenValue(AccountJObject, 'currencyCode').AsInteger();
         MonobankAccount."Currency Code" := FindCurrencyCodeByIso(MonobankAccount."Currency Id");
+        MonobankAccount."Send Id" := GetTextValue(AccountJObject, 'sendId');
         MonobankAccount.Type := GetTextValue(AccountJObject, 'type');
         MonobankAccount.IBAN := GetTextValue(AccountJObject, 'iban');
         MonobankAccount."Cashback Type" := GetTextValue(AccountJObject, 'cashbackType');
@@ -223,6 +224,7 @@ codeunit 50180 "Monobank API"
         MonobankStatement.Hold := GetTokenValue(StatementJObject, 'hold').AsBoolean();
         MonobankStatement."Counter ERDPOU" := GetTextValue(StatementJObject, 'counterEdrpou');
         MonobankStatement."Counter IBAN" := GetTextValue(StatementJObject, 'counterIban');
+        MonobankStatement."Receipt Id" := GetTextValue(StatementJObject, 'receiptId');
 
         if RecordExists then
             MonobankStatement.Modify(true)

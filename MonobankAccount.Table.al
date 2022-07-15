@@ -15,6 +15,11 @@ table 50181 "Monobank Account"
             Caption = 'Account Id';
             DataClassification = EndUserIdentifiableInformation;
         }
+        field(25; "Send Id"; Text[30])
+        {
+            Caption = 'Send Id';
+            DataClassification = EndUserIdentifiableInformation;
+        }
         field(50; "Currency Id"; Integer)
         {
             Caption = 'Currency Id';

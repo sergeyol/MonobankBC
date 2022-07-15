@@ -102,6 +102,11 @@ table 50182 "Monobank Statement"
             Caption = 'Counter IBAN';
             DataClassification = CustomerContent;
         }
+        field(120; "Receipt Id"; Text[30])
+        {
+            Caption = 'Receipt Id';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
