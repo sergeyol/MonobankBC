@@ -2,6 +2,8 @@ table 50182 "Monobank Statement"
 {
     Caption = 'Monobank Statement';
     DataClassification = CustomerContent;
+    LookupPageId = "Monobank Statement";
+    DrillDownPageId = "Monobank Statement";
 
     fields
     {
@@ -39,6 +41,20 @@ table 50182 "Monobank Statement"
         {
             Caption = 'Original MCC';
             DataClassification = CustomerContent;
+        }
+        field(42; "MCC Description"; Text[100])
+        {
+            Caption = 'MCC Description';
+            FieldClass = FlowField;
+            CalcFormula = lookup("Merchant Category Code"."Short Description UA" where(Code = field(MCC)));
+            Editable = false;
+        }
+        field(43; "MCC Group"; Code[10])
+        {
+            Caption = 'MCC Group';
+            FieldClass = FlowField;
+            CalcFormula = lookup("Merchant Category Code"."Group Code" where(Code = field(MCC)));
+            Editable = false;
         }
         field(50; "Currency Id"; Integer)
         {

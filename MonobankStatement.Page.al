@@ -89,6 +89,14 @@ page 50182 "Monobank Statement"
                 {
                     ApplicationArea = All;
                 }
+                field("MCC Description"; Rec."MCC Description")
+                {
+                    ApplicationArea = All;
+                }
+                field("MCC Group"; Rec."MCC Group")
+                {
+                    ApplicationArea = All;
+                }
                 field("Counter ERDPOU"; Rec."Counter ERDPOU")
                 {
                     ApplicationArea = All;
