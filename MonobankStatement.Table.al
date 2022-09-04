@@ -134,4 +134,16 @@ table 50182 "Monobank Statement"
         key(DateKey; "Date Time") { }
     }
 
+    procedure CreateMappingBasedOnStatement()
+    var
+        CategoryMapping: Record "Category Mapping";
+    begin
+        CategoryMapping.Init();
+        CategoryMapping.MCC := rec.MCC;
+        CategoryMapping."MCC Group" := Rec."MCC Group";
+        CategoryMapping.Description := Rec.Description;
+        CategoryMapping.Insert(true);
+
+        page.run(0, CategoryMapping);
+    end;
 }

@@ -109,6 +109,22 @@ page 50182 "Monobank Statement"
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action(CreateMapping)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                begin
+                    Rec.CreateMappingBasedOnStatement();
+                end;
+            }
+        }
+    }
+
     trigger OnOpenPage()
     begin
         if Rec.FindFirst() then;
