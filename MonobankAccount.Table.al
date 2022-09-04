@@ -2,6 +2,8 @@ table 50181 "Monobank Account"
 {
     Caption = 'Monobank Account';
     DataClassification = ToBeClassified;
+    LookupPageId = "Monobank Accounts";
+    DrillDownPageId = "Monobank Accounts";
 
     fields
     {
